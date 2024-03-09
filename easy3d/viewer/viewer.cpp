@@ -67,6 +67,9 @@
 #include <easy3d/util/resource.h>
 #include <easy3d/util/setting.h>
 
+#include <iostream>
+#include <chrono>
+#include <thread>
 
 namespace easy3d {
 
@@ -1087,9 +1090,31 @@ namespace easy3d {
     }
 
 
+    //bool snapshot(const std::string& file_name, 
+      // float scaling = 1.0f, 
+      //cint samples = 0, 
+      // int back_ground = 1, 
+      //bool expand = true) const;
+
+    bool png_needs_to_be_saved = false;
+    void timerTask() {
+      // This function will be called once the timer expires.
+      std::cout << "Timer task executed." << std::endl;
+      png_needs_to_be_saved = true;
+    }
+
+    void startTimer(int duration) {
+      std::thread([duration]() {
+        std::this_thread::sleep_for(std::chrono::seconds(duration));
+        timerTask();
+        }).detach(); // Detach the thread to run independently.
+    }
+
     int Viewer::run(bool see_all) {
         // initialize before showing the window because it can be slow
         init();
+
+        startTimer(5);
 
         // make sure scene fits the screen when the window appears
         if (see_all)
@@ -1103,6 +1128,10 @@ namespace easy3d {
             double last_time = glfwGetTime();   // for frame rate counter
 
             while (!glfwWindowShouldClose(window_) && !should_exit_) {
+              if (png_needs_to_be_saved) {
+                snapshot("C:\\Users\\RansdellC\\dev\\test_output\\test.png");
+                break;
+              }
                 if (!glfwGetWindowAttrib(window_, GLFW_VISIBLE)) { // not visible
                     glfwWaitEvents();
                     continue;
@@ -1559,7 +1588,7 @@ namespace easy3d {
         if (texter_ && texter_->num_fonts() >=2) {
             const float font_size = 15.0f;
             const float offset = 20.0f * dpi_scaling();
-            texter_->draw("Easy3D", offset, offset, font_size, 0);
+            //texter_->draw("Easy3D", offset, offset, font_size, 0);
 
             if (show_frame_rate_)
                 texter_->draw(gpu_time_, offset, 50.0f * dpi_scaling(), 16, 1);
