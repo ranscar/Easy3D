@@ -80,7 +80,7 @@ file(WRITE ${Easy3D_INCLUDE_DIR}/easy3d/util/version.h "${file_content}")
 if (MINGW) # Workaround for using MinGW on Windows
     set(Easy3D_BUILD_SHARED_LIBS                                OFF)
 else()
-    option(Easy3D_BUILD_SHARED_LIBS "Build shared libaries"     ON )
+    option(Easy3D_BUILD_SHARED_LIBS "Build shared libaries"     OFF )
 endif ()
 # Build tutorials
 option(Easy3D_BUILD_TUTORIALS "Build Easy3D tutorials"          ON )
